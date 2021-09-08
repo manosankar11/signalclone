@@ -1,0 +1,53 @@
+import React, { useLayoutEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { Icon } from "react-native-elements";
+import { Input, Button } from 'react-native-elements';
+import { db } from "../firebase";
+
+
+const AddChatScreen = ({ navigation }) => {
+    const [input, setInput] = useState("");
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Add a new group chat",
+            headerBackTitle: "Chats",
+        });
+    }, [navigation]);
+
+    const createChat = async () => {
+        await db.collection("chats")
+            .add({
+                chatName: input
+            })
+            .then(() => {
+                navigation.goBack()
+            })
+            .catch((error) => alert(error));
+    };
+
+    return (
+        <View style={styles.container}>
+            <Input
+                placeholder='Enter a group chat name'
+                value={input}
+                onSubmitEditing={createChat}
+                onChangeText={(text) => setInput(text)}
+                leftIcon={
+                    <Icon name="new-message" type="entypo" size={24} color="black" />
+                }
+            />
+            <Button disabled={!input} onPress={createChat} title='Create new group chat' />
+        </View>
+    );
+};
+
+export default AddChatScreen
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: "white",
+        padding: 30,
+        height: "100%",
+    },
+})
